@@ -193,7 +193,7 @@ function xdotai_load_scripts($hook) {
  
      wp_register_script( 
         'xdotai-js', 
-        plugins_url( 'xdotai-calendar-embed/xdotai-calendar-embed-admin.js' , dirname(__FILE__) ),
+        plugins_url( 'x-ai-calendar-embed/xdotai-calendar-embed-admin.js' , dirname(__FILE__) ),
         array( 'jquery' )
     );
  
