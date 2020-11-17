@@ -5,7 +5,7 @@
  * Description:     Use this simple plugin to quickly embed your x.ai calendar pages anywhere on your Wordpress site with the shortcode [xai-calendar].
  * Author:          x.ai
  * Author URI:      https://x.ai
- * Version:         0.1.0
+ * Version:         1.1.1
  * License:         GPL2
  
 x.ai Calendar Embed is free software: you can redistribute it and/or modify
@@ -87,12 +87,59 @@ function xdotai_settings_init(  ) {
     );
     
     add_settings_field(
+        'xdotaiButtonText',
+        __( 'Button text', 'wordpress' ),
+        'xdotai_xdotaiButtonText_render',
+        'xdotaiPlugin',
+        'xdotai_xdotaiPlugin_section'
+    );
+    
+    add_settings_field(
         'dataElement',
         __( 'Clickable element (advanced)', 'wordpress' ),
         'xdotai_dataElement_render',
         'xdotaiPlugin',
         'xdotai_xdotaiPlugin_section'
     );
+        
+    add_settings_field(
+        'xdotaiLocation',
+        __( 'Location Override (advanced)', 'wordpress' ),
+        'xdotai_xdotaiLocation_render',
+        'xdotaiPlugin',
+        'xdotai_xdotaiPlugin_section'
+    );
+    
+    add_settings_field(
+        'xdotaiHeader',
+        __( 'Show page header', 'wordpress' ),
+        'xdotai_xdotaiHeader_render',
+        'xdotaiPlugin',
+        'xdotai_xdotaiPlugin_section'
+    );
+    
+}
+
+
+function xdotai_xdotaiButtonText_render(  ) {
+    $options = get_option( 'xdotai_settings' );
+    ?>
+    <input id="xdotaiButtonText" type='text' name='xdotai_settings[xdotaiButtonText]' value='<?php echo $options['xdotaiButtonText']; ?>'> Text for the scheduling button. Default is "Schedule a meeting"
+    <?php
+}
+
+function xdotai_xdotaiHeader_render(  ) {
+    $options = get_option( 'xdotai_settings' );
+    ?>
+    <input id="xdotaiHeader" type='checkbox' name='xdotai_settings[xdotaiHeader]' <?php echo $options['xdotaiHeader'] == 'on' ? 'checked' : ''; ?>> Show your profile picture and intro text. Off by default.
+    <?php
+}
+
+function xdotai_xdotaiLocation_render(  ) {
+    $options = get_option( 'xdotai_settings' );
+    ?>
+    <input id="xdotaiLocation" type='text' name='xdotai_settings[xdotaiLocation]' value='<?php echo $options['xdotaiLocation']; ?>'> Location override (must be enabled on your Meeting Template)
+    <?php
 }
 
 function xdotai_text_field_0_render(  ) {
@@ -150,7 +197,7 @@ function xdotai_select_field_1_render(  ) {
 }
 
 function xdotai_settings_section_callback(  ) {
-    echo __( 'Set up your calendar page URL here and then add the shortcode [xai-calendar] to embed the calendar page on your website.', 'wordpress' );
+    echo __( 'Set up your calendar page URL here and then add the shortcode [xai-calendar] to embed the calendar page on your website. <a href="https://help.x.ai/en/articles/3607063-how-do-i-embed-my-calendar-page" target="_BLANK">Read more</a>.', 'wordpress' );
 }
 
 function xdotai_sanitize_input($options) {
@@ -201,18 +248,34 @@ function xdotai_load_scripts($hook) {
 }
 add_action('admin_enqueue_scripts', 'xdotai_load_scripts');
 
+function xdotai_build_options($arr) {
+    if ($arr["xdotaiLocation"] || $arr["xdotaiHeader"] || $arr["xdotaiButtonText"]) {
+        $retv = '<script type="text/javascript">';
+            if ($arr["xdotaiLocation"]) $retv .= 'var xdotaiLocation = \'' . $arr["xdotaiLocation"] . '\';';
+            if ($arr["xdotaiHeader"] == 'on') $retv .= 'var xdotaiHeader = \'' . $arr["xdotaiHeader"] . '\';';
+            if ($arr["xdotaiButtonText"]) $retv .= 'var xdotaiButtonText = \'' . $arr["xdotaiButtonText"] . '\';';
+        $retv .= '</script>';
+        return $retv;
+    } else return '';
+}
+
 function xdotai_calendar_embed_shortcode() {
     $options = get_option( 'xdotai_settings' );
+    $xdotaiVars = xdotai_build_options($options);
     if ($options['xdotai_embed_type'] == 'iframe') {
+        $actual_link = urlencode("http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]");
+        $query_string = '?utm_medium=embed&utm_source=wp-embed&utm_content=' . $actual_link;
+        ($options["xdotaiLocation"]) ? $query_string .= '&xai_location=' . urlencode($options["xdotaiLocation"]) : '';
+        ($options["xdotaiHeader"] == 'on') ? $query_string .= '&header=1' : '';
         $width = $options['iframeWidth'] ? 'width:' . $options['iframeWidth'] . 'px;' : 'width:' . '100%;';
         $height = $options['iframeHeight'] ? 'height:' . $options['iframeHeight'] . 'px;' : 'height:' . '600' . 'px;';
-        $retv = $options['xdotai_calendar_url'] ? '<iframe src="https://x.ai/calendar'. $options['xdotai_calendar_url'] .'?utm_medium=embed&utm_source=wp-embed&utm_content=iframe" style="' . $width . $height . '" scrolling="auto" > </iframe>' : '';
+        $retv = $options['xdotai_calendar_url'] ? '<iframe id="xdotaiiframe" src="https://x.ai/calendar'. $options['xdotai_calendar_url'] . $query_string . '" style="' . $width . $height . '" scrolling="auto" > </iframe>' : '';
     } elseif ($options['xdotai_embed_type'] == 'lightbox') {
         $page       = $options['xdotai_calendar_url'] ? $options['xdotai_calendar_url'] : '';
         $width      = $options['dataWidth'] ? $options['dataWidth'] : '';
         $height     = $options['dataHeight'] ? $options['dataHeight'] : '';
         $element    = $options['dataElement'] ? $options['dataElement'] : '';
-        $retv       = $options['xdotai_calendar_url'] ? '<script type="text/javascript" src="https://x.ai/embed/xdotai-embed.js" id="xdotaiEmbed" data-page="'.$page.'" data-height="'.$height.'" data-width="'.$width.'" data-element="'.$element.'" async></script>' : '';
+        $retv       = $options['xdotai_calendar_url'] ? $xdotaiVars.'<script type="text/javascript" src="https://cdn.x.ai/app/uploads/embed/xdotai-embed.js" id="xdotaiEmbed" data-page="'.$page.'" data-height="'.$height.'" data-width="'.$width.'" data-element="'.$element.'" async></script>' : '';
     } else {
         $retv = '';
     }
