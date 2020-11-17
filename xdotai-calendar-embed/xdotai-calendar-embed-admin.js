@@ -6,12 +6,14 @@ function xdotaiToggle () {
         jQuery('#xdotaiDataElement').parent().parent().hide();
         jQuery('#xdotaiDataHeight').parent().parent().hide();
         jQuery('#xdotaiDataWidth').parent().parent().hide();
+        jQuery('#xdotaiButtonText').parent().parent().hide();
     } else {
         jQuery('#xdotaiIframeHeight').parent().parent().hide();
         jQuery('#xdotaiIframeWidth').parent().parent().hide();
         jQuery('#xdotaiDataElement').parent().parent().show();
         jQuery('#xdotaiDataHeight').parent().parent().show();
         jQuery('#xdotaiDataWidth').parent().parent().show();
+        jQuery('#xdotaiButtonText').parent().parent().show();
     }
 }
 
