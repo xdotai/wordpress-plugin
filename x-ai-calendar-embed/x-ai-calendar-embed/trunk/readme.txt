@@ -34,3 +34,6 @@ This plugin gives you the ability to embed your x.ai calendar page in your Wordp
 * Added option to show or hide header
 * Added option for location overrides
 * Added option to customize default button text
+
+= 1.1.1 =
+* Small bug fixes
