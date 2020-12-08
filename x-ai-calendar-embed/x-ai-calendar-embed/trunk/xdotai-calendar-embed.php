@@ -5,7 +5,7 @@
  * Description:     Use this simple plugin to quickly embed your x.ai calendar pages anywhere on your Wordpress site with the shortcode [xai-calendar].
  * Author:          x.ai
  * Author URI:      https://x.ai
- * Version:         0.1.1
+ * Version:         1.1.1
  * License:         GPL2
  
 x.ai Calendar Embed is free software: you can redistribute it and/or modify
@@ -275,7 +275,7 @@ function xdotai_calendar_embed_shortcode() {
         $width      = $options['dataWidth'] ? $options['dataWidth'] : '';
         $height     = $options['dataHeight'] ? $options['dataHeight'] : '';
         $element    = $options['dataElement'] ? $options['dataElement'] : '';
-        $retv       = $options['xdotai_calendar_url'] ? $xdotaiVars.'<script type="text/javascript" src="/xdotai-embed.js" id="xdotaiEmbed" data-page="'.$page.'" data-height="'.$height.'" data-width="'.$width.'" data-element="'.$element.'" async></script>' : '';
+        $retv       = $options['xdotai_calendar_url'] ? $xdotaiVars.'<script type="text/javascript" src="https://cdn.x.ai/app/uploads/embed/xdotai-embed.js" id="xdotaiEmbed" data-page="'.$page.'" data-height="'.$height.'" data-width="'.$width.'" data-element="'.$element.'" async></script>' : '';
     } else {
         $retv = '';
     }
