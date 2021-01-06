@@ -1,7 +1,7 @@
 === x.ai Calendar Embed ===
 Contributors: xdotaigrowth
 Tags: calendar, calendars, scheduling, embed, embedding, booking
-Tested up to: 5.5.3
+Tested up to: 5.6
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -37,3 +37,8 @@ This plugin gives you the ability to embed your x.ai calendar page in your Wordp
 
 = 1.1.1 =
 * Small bug fixes
+
+= 1.2 =
+* Added shortcode attribute to override the page: i.e. `[xai-calendar page="/mypage/mycal"]`
+* Added fixed button position
+* Added custom CSS classes for scheduling button
