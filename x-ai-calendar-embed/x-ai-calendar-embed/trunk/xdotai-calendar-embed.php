@@ -5,7 +5,7 @@
  * Description:     Use this simple plugin to quickly embed your x.ai calendar pages anywhere on your Wordpress site with the shortcode [xai-calendar].
  * Author:          x.ai
  * Author URI:      https://x.ai
- * Version:         1.1.1
+ * Version:         1.2
  * License:         GPL2
  
 x.ai Calendar Embed is free software: you can redistribute it and/or modify
@@ -45,7 +45,7 @@ function xdotai_settings_init(  ) {
         'xdotaiPlugin',
         'xdotai_xdotaiPlugin_section'
     );
-    
+        
     add_settings_field(
         'xdotai_select_field_1',
         __( 'Type of embed', 'wordpress' ),
@@ -95,6 +95,14 @@ function xdotai_settings_init(  ) {
     );
     
     add_settings_field(
+        'xdotai_button_position',
+        __( 'Button position', 'wordpress' ),
+        'xdotai_select_button_position_render',
+        'xdotaiPlugin',
+        'xdotai_xdotaiPlugin_section'
+    );
+    
+    add_settings_field(
         'dataElement',
         __( 'Clickable element (advanced)', 'wordpress' ),
         'xdotai_dataElement_render',
@@ -106,6 +114,14 @@ function xdotai_settings_init(  ) {
         'xdotaiLocation',
         __( 'Location Override (advanced)', 'wordpress' ),
         'xdotai_xdotaiLocation_render',
+        'xdotaiPlugin',
+        'xdotai_xdotaiPlugin_section'
+    );
+    
+    add_settings_field(
+        'xdotaiCssClasses',
+        __( 'Additional CSS classes (advanced)', 'wordpress' ),
+        'xdotai_css_classes_render',
         'xdotaiPlugin',
         'xdotai_xdotaiPlugin_section'
     );
@@ -145,7 +161,7 @@ function xdotai_xdotaiLocation_render(  ) {
 function xdotai_text_field_0_render(  ) {
     $options = get_option( 'xdotai_settings' );
     ?>
-    <input id="xdotaiCalendarPage" type='text' name='xdotai_settings[xdotai_calendar_url]' value='<?php echo $options['xdotai_calendar_url']; ?>'> The URL of your calendar page. Do not include <span style="font-family:courier;color:red;">https://x.ai/calendar</span>. Example: <span span style="font-family:courier;color:green;">/jenbot/phone</span>
+    <input id="xdotaiCalendarPage" type='text' name='xdotai_settings[xdotai_calendar_url]' value='<?php echo $options['xdotai_calendar_url']; ?>'> The URL of your calendar page. Do not include <span style="font-family:courier;color:red;">https://x.ai/calendar</span>. Example: <span span style="font-family:courier;color:green;">/jenbot/phone</span> Override this with the <span span style="font-family:courier;color:green;">page="/jenbot/phone"</span> shortcode attribute
     <?php
 }
 
@@ -184,6 +200,13 @@ function xdotai_dataElement_render(  ) {
     <?php
 }
 
+function xdotai_css_classes_render(  ) {
+    $options = get_option( 'xdotai_settings' );
+    ?>
+    <input id="xdotaiCssClasses" type='text' name='xdotai_settings[xdotaiCssClasses]' value='<?php echo $options['xdotaiCssClasses']; ?>'> Additional CSS classes to be added to the scheduling button separated by spaces
+    <?php
+}
+
 function xdotai_select_field_1_render(  ) {
     $options = get_option( 'xdotai_settings' );
     ?>
@@ -192,6 +215,22 @@ function xdotai_select_field_1_render(  ) {
         <option value='lightbox' <?php selected( $options['xdotai_embed_type'], 'lightbox' ); ?>>Popup Lightbox</option>
     </select> Inline iFrame embeds your calendar page on your website within the content. Popup Lightbox appears when visitors click a button or link. 
     <a href="https://help.x.ai/en/articles/3607063-how-do-i-embed-my-calendar-page" target="_BLANK">Read more</a>.
+
+<?php
+}
+
+function xdotai_select_button_position_render(  ) {
+    $options = get_option( 'xdotai_settings' );
+    ?>
+    <select id="xdotaiButtonPosition" name='xdotai_settings[xdotai_button_position]'>
+    	<option value <?php selected( $options['xdotai_button_position'], '' ); ?>></option>
+        <option value='topLeft' <?php selected( $options['xdotai_button_position'], 'topLeft' ); ?>>Top left corner</option>
+        <option value='topRight' <?php selected( $options['xdotai_button_position'], 'topRight' ); ?>>Top right corner</option>
+        <option value='topMiddle' <?php selected( $options['xdotai_button_position'], 'topMiddle' ); ?>>Top center</option>
+        <option value='bottomLeft' <?php selected( $options['xdotai_button_position'], 'bottomLeft' ); ?>>Bottom left corner</option>
+        <option value='bottomRight' <?php selected( $options['xdotai_button_position'], 'bottomRight' ); ?>>Bottom right corner</option>
+        <option value='bottomMiddle' <?php selected( $options['xdotai_button_position'], 'bottomMiddle' ); ?>>Bottom center</option>
+    </select> Set the scheduling button to a fixed position on your page or leave this blank to place the button where you place the embed code.
 
 <?php
 }
@@ -249,17 +288,25 @@ function xdotai_load_scripts($hook) {
 add_action('admin_enqueue_scripts', 'xdotai_load_scripts');
 
 function xdotai_build_options($arr) {
-    if ($arr["xdotaiLocation"] || $arr["xdotaiHeader"] || $arr["xdotaiButtonText"]) {
+    if ($arr["xdotaiLocation"] || $arr["xdotaiHeader"] || $arr["xdotaiButtonText"] || $arr["xdotai_button_position"] || $arr["xdotaiCssClasses"]) {
         $retv = '<script type="text/javascript">';
             if ($arr["xdotaiLocation"]) $retv .= 'var xdotaiLocation = \'' . $arr["xdotaiLocation"] . '\';';
             if ($arr["xdotaiHeader"] == 'on') $retv .= 'var xdotaiHeader = \'' . $arr["xdotaiHeader"] . '\';';
             if ($arr["xdotaiButtonText"]) $retv .= 'var xdotaiButtonText = \'' . $arr["xdotaiButtonText"] . '\';';
+            if ($arr["xdotai_button_position"]) $retv .= 'var xdotaiButtonPosition = \'' . $arr["xdotai_button_position"] . '\';';
+            if ($arr["xdotaiCssClasses"]) $retv .= 'var xdotaiCustomClassName = \' ' . $arr["xdotaiCssClasses"] . '\';';
         $retv .= '</script>';
         return $retv;
     } else return '';
 }
 
-function xdotai_calendar_embed_shortcode() {
+function xdotai_calendar_embed_shortcode( $atts ) {
+
+	$atts = shortcode_atts(
+        array(
+            'page' => false
+        ), $atts, 'xai-calendar' 
+    );
     $options = get_option( 'xdotai_settings' );
     $xdotaiVars = xdotai_build_options($options);
     if ($options['xdotai_embed_type'] == 'iframe') {
@@ -271,7 +318,10 @@ function xdotai_calendar_embed_shortcode() {
         $height = $options['iframeHeight'] ? 'height:' . $options['iframeHeight'] . 'px;' : 'height:' . '600' . 'px;';
         $retv = $options['xdotai_calendar_url'] ? '<iframe id="xdotaiiframe" src="https://x.ai/calendar'. $options['xdotai_calendar_url'] . $query_string . '" style="' . $width . $height . '" scrolling="auto" > </iframe>' : '';
     } elseif ($options['xdotai_embed_type'] == 'lightbox') {
-        $page       = $options['xdotai_calendar_url'] ? $options['xdotai_calendar_url'] : '';
+    	if ( !$atts["page"] )
+        	$page   = $options['xdotai_calendar_url'] ? $options['xdotai_calendar_url'] : '';
+        else
+        	$page   = $atts["page"];
         $width      = $options['dataWidth'] ? $options['dataWidth'] : '';
         $height     = $options['dataHeight'] ? $options['dataHeight'] : '';
         $element    = $options['dataElement'] ? $options['dataElement'] : '';
