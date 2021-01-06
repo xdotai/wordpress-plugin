@@ -7,6 +7,8 @@ function xdotaiToggle () {
         jQuery('#xdotaiDataHeight').parent().parent().hide();
         jQuery('#xdotaiDataWidth').parent().parent().hide();
         jQuery('#xdotaiButtonText').parent().parent().hide();
+        jQuery('#xdotaiButtonPosition').parent().parent().hide();
+        jQuery('#xdotaiCssClasses').parent().parent().hide();
     } else {
         jQuery('#xdotaiIframeHeight').parent().parent().hide();
         jQuery('#xdotaiIframeWidth').parent().parent().hide();
@@ -14,6 +16,8 @@ function xdotaiToggle () {
         jQuery('#xdotaiDataHeight').parent().parent().show();
         jQuery('#xdotaiDataWidth').parent().parent().show();
         jQuery('#xdotaiButtonText').parent().parent().show();
+        jQuery('#xdotaiButtonPosition').parent().parent().show();
+        jQuery('#xdotaiCssClasses').parent().parent().show();
     }
 }
 
